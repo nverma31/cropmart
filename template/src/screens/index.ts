@@ -1,2 +1,10 @@
 export { default as Example } from './Example/Example';
 export { default as Startup } from './Startup/Startup';
+export { default as Login } from './Login/Login';
+export { default as IntermediaryDashboard } from './Intermediary/Dashboard';
+export { default as FarmerHome } from './Farmer/Home';
+export { default as CreateEnquiry } from './Intermediary/CreateEnquiry';
+export { default as OnboardFarmer } from './Intermediary/OnboardFarmer';
+export { default as MyFarmers } from './Intermediary/MyFarmers';
+export { default as Profile } from './Profile/Profile';
+export { default as Signup } from './Login/Signup';

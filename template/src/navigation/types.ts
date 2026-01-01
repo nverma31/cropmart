@@ -8,4 +8,12 @@ export type RootScreenProps<
 export type RootStackParamList = {
   [Paths.Example]: undefined;
   [Paths.Startup]: undefined;
+  [Paths.Login]: undefined;
+  [Paths.IntermediaryDashboard]: undefined;
+  [Paths.FarmerHome]: undefined;
+  [Paths.CreateEnquiry]: undefined;
+  [Paths.OnboardFarmer]: undefined;
+  [Paths.MyFarmers]: undefined;
+  [Paths.Profile]: undefined;
+  [Paths.Signup]: { phone: string };
 };
