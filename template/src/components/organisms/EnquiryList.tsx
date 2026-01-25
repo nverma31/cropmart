@@ -1,11 +1,10 @@
 import React from 'react';
 import { View, Text, FlatList, StyleSheet, TouchableOpacity } from 'react-native';
-import { useTheme } from '@/theme';
-import { Enquiry } from '@/services/api/types';
+import { PurchaseEnquiry } from '@/services/api/types';
 
 interface EnquiryListProps {
-    enquiries: Enquiry[];
-    onPressItem?: (enquiry: Enquiry) => void;
+    enquiries: PurchaseEnquiry[];
+    onPressItem?: (enquiry: PurchaseEnquiry) => void;
     layout: any;
     gutters: any;
     fonts: any;
@@ -13,7 +12,7 @@ interface EnquiryListProps {
 
 const EnquiryList = ({ enquiries, onPressItem, layout, gutters, fonts }: EnquiryListProps) => {
 
-    const renderItem = ({ item }: { item: Enquiry }) => (
+    const renderItem = ({ item }: { item: PurchaseEnquiry }) => (
         <TouchableOpacity
             style={styles.card}
             onPress={() => onPressItem && onPressItem(item)}
@@ -21,8 +20,8 @@ const EnquiryList = ({ enquiries, onPressItem, layout, gutters, fonts }: Enquiry
         >
             <View style={[layout.row, layout.justifyBetween, gutters.marginBottom_12]}>
                 <View>
-                    <Text style={[fonts.size_16, fonts.bold, styles.productText]}>{item.product}</Text>
-                    <Text style={[fonts.size_12, styles.farmerText]}>{item.farmerName}</Text>
+                    <Text style={[fonts.size_16, fonts.bold, styles.productText]}>{item.productType}</Text>
+                    <Text style={[fonts.size_12, styles.farmerText]}>ID: {item.id}</Text>
                 </View>
                 <View style={[styles.statusBadge, getStatusStyle(item.status)]}>
                     <Text style={[fonts.size_12, fonts.bold, getStatusTextStyle(item.status)]}>{item.status}</Text>
@@ -32,11 +31,11 @@ const EnquiryList = ({ enquiries, onPressItem, layout, gutters, fonts }: Enquiry
             <View style={[layout.row, layout.justifyBetween]}>
                 <View>
                     <Text style={[fonts.size_12, styles.label]}>Quantity</Text>
-                    <Text style={[fonts.size_16, fonts.bold, styles.value]}>{item.quantity}</Text>
+                    <Text style={[fonts.size_16, fonts.bold, styles.value]}>{item.quantity} {item.quantityUnit}</Text>
                 </View>
                 <View>
-                    <Text style={[fonts.size_12, styles.label]}>Price</Text>
-                    <Text style={[fonts.size_16, fonts.bold, styles.value]}>{item.expectedPrice}</Text>
+                    <Text style={[fonts.size_12, styles.label]}>Expected Price</Text>
+                    <Text style={[fonts.size_16, fonts.bold, styles.value]}>₹{item.expectedPrice}</Text>
                 </View>
                 <View style={{ alignItems: 'flex-end' }}>
                     <Text style={[fonts.size_12, styles.label]}>Payment</Text>
@@ -52,9 +51,9 @@ const EnquiryList = ({ enquiries, onPressItem, layout, gutters, fonts }: Enquiry
         <FlatList
             data={enquiries}
             renderItem={renderItem}
-            keyExtractor={item => item.id}
+            keyExtractor={item => item.id.toString()}
             contentContainerStyle={styles.listContent}
-            scrollEnabled={false} // Since we use it inside a ScrollView usually
+            scrollEnabled={false}
         />
     );
 };
@@ -62,8 +61,10 @@ const EnquiryList = ({ enquiries, onPressItem, layout, gutters, fonts }: Enquiry
 const getStatusStyle = (status: string) => {
     switch (status) {
         case 'CREATED': return { backgroundColor: '#EFF8FF' };
-        case 'IN_PROGRESS': return { backgroundColor: '#FFFAEB' };
-        case 'CONFIRMED': return { backgroundColor: '#ECFDF3' };
+        case 'PENDING': return { backgroundColor: '#FFFAEB' };
+        case 'APPROVED': return { backgroundColor: '#ECFDF3' };
+        case 'COMPLETED': return { backgroundColor: '#F2F4F7' };
+        case 'CANCELLED': return { backgroundColor: '#FEF3F2' };
         default: return { backgroundColor: '#F2F4F7' };
     }
 };
@@ -71,8 +72,10 @@ const getStatusStyle = (status: string) => {
 const getStatusTextStyle = (status: string) => {
     switch (status) {
         case 'CREATED': return { color: '#2E90FA' };
-        case 'IN_PROGRESS': return { color: '#B54708' };
-        case 'CONFIRMED': return { color: '#039855' };
+        case 'PENDING': return { color: '#B54708' };
+        case 'APPROVED': return { color: '#039855' };
+        case 'COMPLETED': return { color: '#344054' };
+        case 'CANCELLED': return { color: '#D92D20' };
         default: return { color: '#344054' };
     }
 };

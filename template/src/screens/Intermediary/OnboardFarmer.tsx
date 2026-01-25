@@ -55,7 +55,7 @@ function OnboardFarmer({ navigation }: RootScreenProps<Paths.OnboardFarmer>) {
 
                     {/* Note Section */}
                     <View style={styles.noteBox}>
-                        <Text style={[fonts.size_14, { color: '#1C398E', lineHeight: 20 }]}>
+                        <Text style={[fonts.size_12, { color: '#1C398E', lineHeight: 20 }]}>
                             Note: The farmer will receive an SMS with login credentials to access their account.
                         </Text>
                     </View>

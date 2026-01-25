@@ -23,7 +23,7 @@ export const storage = new MMKV();
 
 function App() {
   return (
-    <GestureHandlerRootView>
+    <GestureHandlerRootView style={{ flex: 1 }}>
       <QueryClientProvider client={queryClient}>
         <ThemeProvider storage={storage}>
           <ApplicationNavigator />

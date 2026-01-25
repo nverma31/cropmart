@@ -1,78 +1,138 @@
-import { AuthResponse, User } from './types';
+/**
+ * Authentication Service
+ * 
+ * MOCK MODE: Uses in-memory data until backend OTP is ready
+ * Backend: https://cropmart-backend.onrender.com/v1
+ */
 
-// Mock delay to simulate network request
+import ApiClient from './ApiClient';
+import {
+    User,
+    Farmer,
+    Intermediary,
+} from './types';
+
+// Mock delay
 const delay = (ms: number) => new Promise(resolve => setTimeout(resolve, ms));
 
-class AuthService {
-    private currentUser: User | null = null;
+// Mock data stores (in-memory until backend ready)
+let MOCK_USERS: User[] = [];
+let MOCK_FARMERS: Farmer[] = [];
+let MOCK_INTERMEDIARIES: Intermediary[] = [];
 
-    async sendOtp(phone: string): Promise<boolean> {
+interface MockVerifyOtpResponse {
+    user: User;
+    token: string;
+    isNewUser: boolean;
+}
+
+class AuthService {
+    /**
+     * MOCK: Request OTP for phone number
+     */
+    async sendOtp(phone: string): Promise<void> {
         await delay(1000);
-        // In a real app, this would call the backend to send SMS
-        console.log(`[MockAuth] OTP sent to ${phone}`);
-        return true;
+        console.log(`[MockAuth] OTP sent to ${phone}. Use '1234' to verify.`);
     }
 
-    async verifyOtp(phone: string, otp: string): Promise<AuthResponse> {
+    /**
+     * MOCK: Verify OTP and login/register
+     * Returns: { user, token, isNewUser }
+     */
+    async verifyOtp(phone: string, otp: string): Promise<MockVerifyOtpResponse> {
         await delay(1500);
 
-        // Mock validation
         if (otp !== '1234') {
             throw new Error('Invalid OTP. Please enter 1234.');
         }
 
-        // Mock User Generation based on Phone Number for testing
-        // Ends with 2222 -> Intermediary
-        // Ends with 1111 -> Farmer
-        // Others -> New User
+        let user = MOCK_USERS.find(u => u.phone === phone);
+        const isNewUser = !user;
 
-        if (phone.endsWith('1111') || phone.endsWith('2222')) {
+        if (!user) {
             const isIntermediary = phone.endsWith('2222');
-            const user: User = {
-                id: isIntermediary ? 'int_001' : 'farm_001',
-                name: isIntermediary ? 'Rajesh Kumar (Intermediary)' : 'Suresh Kisan',
-                phone,
+            user = {
+                id: Date.now(),
                 role: isIntermediary ? 'INTERMEDIARY' : 'FARMER',
-                farmLocation: isIntermediary ? undefined : 'Punjab, District Ludhiana',
-                farmSize: isIntermediary ? undefined : '15 Acres',
+                phone,
+                name: isIntermediary ? 'Rajesh Kumar' : 'Suresh Kisan',
+                isActive: true,
+                createdAt: new Date().toISOString(),
+                updatedAt: new Date().toISOString(),
             };
+            MOCK_USERS.push(user);
+        }
 
-            this.currentUser = user;
+        const token = `mock-jwt-token-${Date.now()}`;
+        ApiClient.setToken(token);
 
-            return {
-                user,
-                token: 'mock-jwt-token-' + Date.now(),
-                isNewUser: false,
+        return { user, token, isNewUser };
+    }
+
+    /**
+     * MOCK: Create Farmer or Intermediary profile
+     */
+    async createProfile(
+        userId: number,
+        role: 'FARMER' | 'INTERMEDIARY',
+        data: any
+    ): Promise<Farmer | Intermediary> {
+        await delay(1000);
+
+        if (role === 'FARMER') {
+            const farmer: Farmer = {
+                id: Date.now(),
+                userId,
+                address: data.address,
+                district: data.district,
+                state: data.state,
+                pincode: data.pincode,
+                landHolding: data.landHolding,
+                createdAt: new Date().toISOString(),
+                updatedAt: new Date().toISOString(),
             };
+            MOCK_FARMERS.push(farmer);
+            return farmer;
         } else {
-            return {
-                isNewUser: true,
+            const intermediary: Intermediary = {
+                id: Date.now(),
+                userId,
+                businessName: data.businessName,
+                businessType: data.businessType,
+                gstNumber: data.gstNumber,
+                address: data.address,
+                district: data.district,
+                state: data.state,
+                pincode: data.pincode,
+                createdAt: new Date().toISOString(),
+                updatedAt: new Date().toISOString(),
             };
+            MOCK_INTERMEDIARIES.push(intermediary);
+            return intermediary;
         }
     }
 
-    async register(userData: Omit<User, 'id'>): Promise<AuthResponse> {
-        await delay(1500);
-
-        const newUser: User = {
-            ...userData,
-            id: `user_${Date.now()}`,
-        };
-
-        this.currentUser = newUser;
-        return {
-            user: newUser,
-            token: 'mock-jwt-token-' + Date.now(),
-            isNewUser: false,
-        };
-    }
-    async logout(): Promise<void> {
+    /**
+     * MOCK: Get user's profile
+     */
+    async getMyProfile(
+        userId: number,
+        role: 'FARMER' | 'INTERMEDIARY'
+    ): Promise<Farmer | Intermediary | null> {
         await delay(500);
-        this.currentUser = null;
+        if (role === 'FARMER') {
+            return MOCK_FARMERS.find(f => f.userId === userId) || null;
+        } else {
+            return MOCK_INTERMEDIARIES.find(i => i.userId === userId) || null;
+        }
     }
 
-    getCurrentUser(): User | null {
-        return this.currentUser;
+    async logout(): Promise<void> {
+        ApiClient.setToken(null);
+    }
+
+    isRoleAllowedInApp(user: User): boolean {
+        return user.role === 'FARMER' || user.role === 'INTERMEDIARY';
     }
 }
 

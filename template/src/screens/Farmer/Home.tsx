@@ -5,7 +5,7 @@ import { useAuth } from '@/hooks/useAuth';
 import { SafeScreen } from '@/components/templates';
 import EnquiryList from '@/components/organisms/EnquiryList';
 import EnquiryService from '@/services/api/EnquiryService';
-import { Enquiry } from '@/services/api/types';
+import { PurchaseEnquiry } from '@/services/api/types';
 import { SvgUri } from 'react-native-svg';
 import { useFocusEffect } from '@react-navigation/native';
 
@@ -18,14 +18,14 @@ function FarmerHome({ navigation }: RootScreenProps<Paths.FarmerHome>) {
     const { layout, gutters, fonts, colors } = useTheme();
     const { user } = useAuth();
 
-    const [enquiries, setEnquiries] = useState<Enquiry[]>([]);
+    const [enquiries, setEnquiries] = useState<PurchaseEnquiry[]>([]);
     const [loading, setLoading] = useState(true);
     const [refreshing, setRefreshing] = useState(false);
 
     const fetchEnquiries = async () => {
         if (!user) return;
         try {
-            const data = await EnquiryService.getEnquiries('FARMER', user.id);
+            const data = await EnquiryService.getEnquiries();
             setEnquiries(data);
         } catch (error) {
             console.error(error);

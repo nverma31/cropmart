@@ -1,21 +1,17 @@
 import React, { useEffect } from 'react';
-import { View, ActivityIndicator } from 'react-native';
+import { View, ActivityIndicator, Text } from 'react-native';
 import { useTheme } from '@/theme';
 import { Paths } from '@/navigation/paths';
 import { SafeScreen } from '@/components/templates';
 import type { RootScreenProps } from '@/navigation/types';
 
-import Logo from '@/theme/assets/icons/logo.svg';
-
 function Startup({ navigation }: RootScreenProps<Paths.Startup>) {
-  const { layout, gutters } = useTheme();
+  const { layout, colors, fonts } = useTheme();
 
   useEffect(() => {
+    // Only used in the unauthenticated stack to transition to Login
     const timer = setTimeout(() => {
-      navigation.reset({
-        index: 0,
-        routes: [{ name: Paths.Login }],
-      });
+      navigation.replace(Paths.Login);
     }, 2000);
     return () => clearTimeout(timer);
   }, [navigation]);
@@ -28,10 +24,14 @@ function Startup({ navigation }: RootScreenProps<Paths.Startup>) {
           layout.col,
           layout.itemsCenter,
           layout.justifyCenter,
+          { backgroundColor: '#fff' }
         ]}
       >
-        <Logo width={300} height={300} />
-        <ActivityIndicator size="large" style={[gutters.marginVertical_24]} />
+        <View style={{ width: 120, height: 120, borderRadius: 60, backgroundColor: '#F6FEF9', alignItems: 'center', justifyContent: 'center', marginBottom: 24 }}>
+          <Text style={[fonts.bold, { color: colors.primaryGreen, fontSize: 40 }]}>CM</Text>
+        </View>
+        <Text style={[fonts.size_24, fonts.bold, { color: colors.primaryGreen, marginBottom: 8 }]}>CropMart</Text>
+        <ActivityIndicator size="large" color={colors.primaryGreen} />
       </View>
     </SafeScreen>
   );

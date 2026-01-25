@@ -15,5 +15,5 @@ export type RootStackParamList = {
   [Paths.OnboardFarmer]: undefined;
   [Paths.MyFarmers]: undefined;
   [Paths.Profile]: undefined;
-  [Paths.Signup]: { phone: string };
+  [Paths.Signup]: { phone: string; userId: number; role: 'FARMER' | 'INTERMEDIARY' };
 };
